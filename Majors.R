@@ -63,21 +63,21 @@ graphnames <- list(c("melt1","melt2","melt3"))
 ylabs <- c("Graduates","Percent of Total Grads","Grad Pct of US Pop")
 models <- list(melt1, melt2, melt3)
 fnames <- c("a.pdf","b.pdf","c.pdf")
-tnames <- c("US Undergraduate Degrees by Category of Major",
-            "US Undergraduate Degrees by Percentage of Category",
-            "US Undergraduate Degrees as % of US Population")
+tnames <- c("Undergraduate Degrees by Category of Major",
+            "Undergraduate Degrees by Percentage of Category",
+            "Undergraduate Degrees as % of US Population")
 for (i in 1:3) {
     modx <- as.data.frame(models[i])
   
     p <- ggplot(modx, aes(x=Year,y=Graduates,colour=Category,group=Category)) + geom_line(size=2) + 
-      ggtitle(tnames)
+      ggtitle(tnames[i])
     
     p <- p + scale_x_discrete(breaks=c(seq(1971,2012,by=4))) + labs(y = ylabs[i])
-    
+
     p <- p + theme(axis.text.x = element_text(size=rel(2)), axis.title.x = element_text(size = rel(2)), axis.title.y = element_text(size = rel(2))) 
     p <- p + theme(legend.text = element_text(size=14)) + theme(plot.title=element_text(size=rel(2.5)))
     if (i == 2) p <- p + scale_y_continuous(breaks=seq(0,60,10))
-    p
-    ggsave(fnames[i])
+    
+    ggsave(fnames[i],width=11,height=8.5)
  
 }
