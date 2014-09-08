@@ -1,3 +1,7 @@
+## Simple graphs for NCES college major data
+## Needs Table_322_10_Extract.csv from http://github
+## irm 9/7/14
+
 remove(list=ls())
 setwd("~/Dropbox/Majors")
 
@@ -11,26 +15,26 @@ yrsRaw <- length(colnames(Table_322_10_Extract))
 tmf <- Table_322_10_Extract[,3:yrsRaw]
 
 colnames(tmf) <- as.character(as.numeric(substr(colnames(tmf),2,5))+1)
-                                     
-tvseq <- function(...)t(Vectorize(seq.default)(...))
 
+# linear interpolation of years with five year gaps
+tvseq <- function(...)t(Vectorize(seq.default)(...))
 years <- as.numeric(colnames(tmf))
 d <- diff(years)
 L <- lapply(seq(d), function(i) tvseq(from=tmf[,i], to=tmf[,i+1], length.out=d[i]+1)[,-1])
+
 result <- cbind(tmf[,1], do.call(cbind, L))
 colnames(result) <- min(years):max(years)
+
 rezsum <- apply(result,2,sum)
 rezperc <- sweep(result, 2, rezsum, '/')*100
 rezpop <- sweep(result*100,2, US_Pop[,2], '/')
 
 result1 <- cbind(Table_322_10_Extract[,1:2],result)
-
-
 result2 <- cbind(Table_322_10_Extract[,1:2],rezperc)
 result3 <- cbind(Table_322_10_Extract[,1:2],rezpop)
 
 ###########################################
-# Create Line Chart
+# Create Line Charts
 
 require(ggplot2)
 require(reshape)
@@ -59,11 +63,14 @@ graphnames <- list(c("melt1","melt2","melt3"))
 ylabs <- c("Graduates","Percent of Total Grads","Grad Pct of US Pop")
 models <- list(melt1, melt2, melt3)
 fnames <- c("a.pdf","b.pdf","c.pdf")
+tnames <- c("US Undergraduate Degrees by Category of Major",
+            "US Undergraduate Degrees by Percentage of Category",
+            "US Undergraduate Degrees as % of US Population")
 for (i in 1:3) {
     modx <- as.data.frame(models[i])
   
     p <- ggplot(modx, aes(x=Year,y=Graduates,colour=Category,group=Category)) + geom_line(size=2) + 
-      ggtitle("US Undergraduate Degrees by Category of Major")
+      ggtitle(tnames)
     
     p <- p + scale_x_discrete(breaks=c(seq(1971,2012,by=4))) + labs(y = ylabs[i])
     
